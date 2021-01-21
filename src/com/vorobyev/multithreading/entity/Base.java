@@ -21,7 +21,7 @@ public class Base {
 
     private static final int INITIAL_PRODUCT_COUNT = 50;
 
-    private static final Base INSTANCE = new Base();
+    private static Base INSTANCE = new Base();
 
     private final ArrayDeque<Truck> queue = new ArrayDeque<>();
 
@@ -36,6 +36,14 @@ public class Base {
     private static final Lock locker = new ReentrantLock();
 
     public static Base getInstance() {
+        locker.lock();
+        try {
+            if (INSTANCE == null) {
+                INSTANCE = new Base();
+            }
+        } finally {
+            locker.unlock();
+        }
         return INSTANCE;
     }
 
