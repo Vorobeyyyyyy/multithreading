@@ -21,9 +21,7 @@ public class Base {
 
     private static final int INITIAL_PRODUCT_COUNT = 50;
 
-    private static Base INSTANCE = new Base();
-
-    private final ArrayDeque<Truck> queue = new ArrayDeque<>();
+    private static Base INSTANCE;
 
     private final List<Terminal> terminals = new ArrayList<>();
 
@@ -62,8 +60,6 @@ public class Base {
                 Terminal terminal = optionalTerminal.get();
                 terminal.setState(TerminalState.BUSY);
                 terminal.setTruck(truck);
-            } else {
-                queue.addLast(truck);
             }
         } catch (InterruptedException exception) {
             logger.log(Level.ERROR, exception.getMessage());
@@ -79,22 +75,12 @@ public class Base {
             if (optionalTerminal.isPresent()) {
                 Terminal terminal = optionalTerminal.get();
                 terminal.setTruck(null);
-                if (queue.isEmpty()) {
-                    terminal.setState(TerminalState.FREE);
-                } else {
-                    serveByQuery(terminal);
-                }
             }
         } finally {
             locker.unlock();
             terminalSemaphore.release();
         }
 
-    }
-
-    private void serveByQuery(Terminal terminal) {
-        Truck truck = queue.removeFirst();
-        terminal.setTruck(truck);
     }
 
     public Optional<Terminal> findTruckTerminal(Truck truck) {
