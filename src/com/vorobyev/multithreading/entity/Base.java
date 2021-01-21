@@ -75,6 +75,7 @@ public class Base {
             if (optionalTerminal.isPresent()) {
                 Terminal terminal = optionalTerminal.get();
                 terminal.setTruck(null);
+                terminal.setState(TerminalState.FREE);
             }
         } finally {
             locker.unlock();
