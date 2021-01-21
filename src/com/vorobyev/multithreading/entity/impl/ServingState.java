@@ -45,6 +45,5 @@ public class ServingState extends AbstractTruckState {
         }
         BASE.leaveTruck(actionTruck);
         actionTruck.setTruckState(TransitState.getInstance());
-
     }
 }

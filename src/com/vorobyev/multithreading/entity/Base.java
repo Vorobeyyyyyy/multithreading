@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -21,7 +22,8 @@ public class Base {
 
     private static final int INITIAL_PRODUCT_COUNT = 50;
 
-    private static Base INSTANCE;
+    private final static AtomicBoolean initialized = new AtomicBoolean(false);
+    private static Base instance;
 
     private final List<Terminal> terminals = new ArrayList<>();
 
@@ -30,19 +32,22 @@ public class Base {
     private final Semaphore terminalSemaphore = new Semaphore(TERMINAL_COUNT, true);
 
     private final Semaphore productSemaphore = new Semaphore(INITIAL_PRODUCT_COUNT, true);
-
+    
     private static final Lock locker = new ReentrantLock();
 
     public static Base getInstance() {
-        locker.lock();
-        try {
-            if (INSTANCE == null) {
-                INSTANCE = new Base();
+        if (!initialized.get()) {
+            locker.lock();
+            try {
+                if (instance == null) {
+                    instance = new Base();
+                    initialized.set(true);
+                }
+            } finally {
+                locker.unlock();
             }
-        } finally {
-            locker.unlock();
         }
-        return INSTANCE;
+        return instance;
     }
 
     private Base() {
